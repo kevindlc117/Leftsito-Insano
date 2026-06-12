@@ -16,12 +16,12 @@
 
     :root {
       --bg-dark:        #0B0C07;
-      --orange:         #CC1A1A;
+      --orange:          #CC1A1A;
       --orange-bright:  #E83030;
       --orange-dark:    #8B0000;
       --amber:          #D44040;
       --text-primary:   #E8D4B0;
-      --text-muted:     #7A7060;
+      --text-muted:      #7A7060;
     }
 
     html, body {
@@ -191,12 +191,14 @@
       50%       { opacity: 0.3; box-shadow: 0 0 2px #4EE04E; }
     }
 
-    /* ── CONNECT BUTTON ───────────────────────────── */
+    /* ── CONNECT BUTTONS ──────────────────────────── */
     .connect-wrap {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 12px;
+      width: 100%;
     }
 
     /* Signature element: infection pulse ring */
@@ -216,6 +218,7 @@
       50%       { transform: translate(-50%, -50%) scale(1.5); opacity: 0.15; }
     }
 
+    /* Botón Principal (Juego Cerrado) */
     .btn-connect {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(2.4rem, 7vw, 3.2rem);
@@ -226,7 +229,7 @@
       border-radius: 5px;
       border-top:    2px solid rgba(255, 160, 160, 0.45);
       border-bottom: 2px solid rgba(60, 0, 0, 0.9);
-      padding: 20px 88px;
+      padding: 16px 88px;
       cursor: pointer;
       text-decoration: none;
       display: inline-block;
@@ -240,7 +243,6 @@
       user-select: none;
       text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
-    /* Shine overlay */
     .btn-connect::before {
       content: '';
       position: absolute;
@@ -266,10 +268,36 @@
         inset 0 3px 6px rgba(0,0,0,0.3);
     }
 
+    /* Botón Secundario (Juego Abierto - Mods de la Workshop) */
+    .btn-secondary {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      letter-spacing: 0.15em;
+      color: var(--text-primary);
+      background: rgba(20, 5, 5, 0.65);
+      border: 1px solid var(--orange-dark);
+      border-radius: 5px;
+      padding: 14px 50px;
+      cursor: pointer;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      transition: all 0.18s ease;
+      user-select: none;
+      text-decoration: none;
+    }
+    .btn-secondary:hover {
+      border-color: var(--orange-bright);
+      background: rgba(139, 0, 0, 0.25);
+      box-shadow: 0 0 25px rgba(204,26,26,0.35);
+      transform: translateY(-2px);
+    }
+    .btn-secondary:active {
+      transform: translateY(1px);
+    }
+
     /* ── HELPER TEXT ──────────────────────────────── */
     .helper-text {
-      margin-top: 22px;
-      max-width: 360px;
+      max-width: 420px;
       font-size: 0.8rem;
       font-weight: 300;
       color: var(--text-muted);
@@ -277,35 +305,14 @@
       letter-spacing: 0.06em;
     }
 
-    /* ── SERVER INFO BOX ──────────────────────────── */
-    .server-info {
-      margin-top: 40px;
-      border: 1px solid rgba(204,26,26,0.2);
-      background: rgba(40,10,10,0.35);
-      padding: 14px 32px;
-      display: inline-flex;
-      flex-direction: column;
-      gap: 5px;
-      font-size: 0.7rem;
-      letter-spacing: 0.16em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-    .server-info strong {
-      color: rgba(220,140,140,0.7);
+    .step-highlight {
+      color: #4EE04E;
       font-weight: 600;
-    }
-    .server-address {
-      font-family: 'Courier New', monospace;
-      color: rgba(190,100,100,0.65);
-      font-size: 0.76rem;
-      letter-spacing: 0.1em;
     }
 
     /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 480px) {
-      .btn-connect { padding: 18px 40px; width: 100%; text-align: center; }
-      .server-info { width: 100%; text-align: center; }
+      .btn-connect, .btn-secondary { padding: 18px 40px; width: 100%; text-align: center; }
       .infection-ring { width: 260px; height: 90px; }
     }
 
@@ -332,14 +339,51 @@
 
     <div class="connect-wrap">
       <div class="infection-ring"></div>
-      <a class="btn-connect" href="steam://connect/147.185.221.211:37670">CONECTAR</a>
-      <p class="helper-text">
-        Haz clic para conectarte directamente al servidor.<br>
-        Left 4 Dead 2 debe estar instalado.
+      
+      <a class="btn-connect" href="steam://rungameid/550//+connect%20147.185.221.211:37670">MODO RÁPIDO</a>
+      <p class="helper-text" style="margin-top: -4px; margin-bottom: 20px;">
+        Usa este si tienes el juego cerrado.<br>
+        <span style="color: var(--orange-bright);">⚠ Nota: No indexará tus Addons/Mods del Workshop.</span>
+      </p>
+
+      <button class="btn-secondary" id="btn-copy" onclick="copiarComando()">MODO COMPATIBLE (MODS)</button>
+      <p class="helper-text" id="copy-instructions">
+        Inicia el juego normalmente, espera que carguen tus addons en el menú principal y haz clic aquí para copiar el comando de acceso rápido.
       </p>
     </div>
 
   </div>
+
+  <script>
+    function copiarComando() {
+      const comandoIP = "connect 147.185.221.211:37670";
+      
+      navigator.clipboard.writeText(comandoIP).then(() => {
+        const btn = document.getElementById('btn-copy');
+        const instrucciones = document.getElementById('copy-instructions');
+        
+        // Feedback visual táctico e instantáneo
+        btn.innerText = "¡CONEXIÓN COPIADA!";
+        btn.style.borderColor = "#4EE04E";
+        btn.style.color = "#4EE04E";
+        
+        // Instrucciones paso a paso dinámicas
+        instrucciones.innerHTML = `
+          <span class="step-highlight">¡Listo!</span> Vuelve a tu Left 4 Dead 2 abierto ➔ Abre tu consola de desarrollador ➔ Presiona <span class="step-highlight">Ctrl + V</span> y dale a Enter.
+        `;
+        
+        // Retornar a la normalidad tras 8 segundos
+        setTimeout(() => {
+          btn.innerText = "MODO COMPATIBLE (MODS)";
+          btn.style.borderColor = "";
+          btn.style.color = "";
+          instrucciones.innerHTML = "Inicia el juego normalmente, espera que carguen tus addons en el menú principal y haz clic aquí para copiar el comando de acceso rápido.";
+        }, 8000);
+      }).catch(err => {
+        console.error('Error al interactuar con el portapapeles: ', err);
+      });
+    }
+  </script>
 
 </body>
 </html>
