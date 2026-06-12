@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L4D2 — Servidor Privado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-dark:        #0B0C07;
+      --orange:         #E8720C;
+      --orange-bright:  #FF8A1E;
+      --orange-dark:    #B85A00;
+      --amber:          #C89000;
+      --text-primary:   #E8D4B0;
+      --text-muted:     #7A7060;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    body {
+      font-family: 'Oswald', sans-serif;
+      background-color: var(--bg-dark);
+      background-image:
+        /* scanlines */
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(0,0,0,0.09) 3px,
+          rgba(0,0,0,0.09) 4px
+        ),
+        /* diagonal scratches */
+        repeating-linear-gradient(
+          -47deg,
+          transparent,
+          transparent 110px,
+          rgba(255,130,0,0.018) 110px,
+          rgba(255,130,0,0.018) 111px
+        ),
+        /* centre glow */
+        radial-gradient(ellipse at 50% 42%, #1B240D 0%, var(--bg-dark) 68%);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Top hazard stripe */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 9px;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--orange) 0px, var(--orange) 10px,
+        #10110A 10px,  #10110A 20px
+      );
+      z-index: 100;
+    }
+
+    /* Bottom hazard stripe */
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 9px;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--orange) 0px, var(--orange) 10px,
+        #10110A 10px,  #10110A 20px
+      );
+      z-index: 100;
+    }
+
+    /* ── PAGE WRAPPER ─────────────────────────────── */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 820px;
+      padding: 72px 28px 60px;
+      text-align: center;
+    }
+
+    /* ── DANGER TAG ───────────────────────────────── */
+    .danger-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(184, 90, 0, 0.12);
+      border: 1px solid rgba(232, 114, 12, 0.28);
+      padding: 5px 20px;
+      margin-bottom: 38px;
+      letter-spacing: 0.22em;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--amber);
+      text-transform: uppercase;
+    }
+    .danger-tag::before,
+    .danger-tag::after { content: '⚠'; color: var(--orange); font-size: 0.75rem; }
+
+    /* ── TITLE ────────────────────────────────────── */
+    .title-main {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.8rem, 12vw, 7.5rem);
+      line-height: 0.88;
+      letter-spacing: 0.07em;
+      color: var(--text-primary);
+      text-shadow:
+        2px 2px 0 #000,
+        4px 4px 0 rgba(0,0,0,0.45),
+        0 0 50px rgba(232,114,12,0.2);
+    }
+    .title-main em {
+      font-style: normal;
+      color: var(--orange);
+      text-shadow:
+        0 0 28px rgba(232,114,12,0.7),
+        0 0 70px rgba(232,114,12,0.25),
+        2px 2px 0 #000;
+    }
+
+    .title-sub {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1rem, 2.8vw, 1.6rem);
+      letter-spacing: 0.38em;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* ── DIVIDER ──────────────────────────────────── */
+    .divider {
+      width: min(480px, 90%);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--orange-dark) 40%, var(--orange-dark) 60%, transparent);
+      margin: 30px auto;
+      position: relative;
+    }
+    .divider::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 7px; height: 7px;
+      background: var(--orange);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    }
+
+    /* ── SERVER STATUS ────────────────────────────── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 48px;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      background: #4EE04E;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4EE04E;
+      flex-shrink: 0;
+      animation: pulse-dot 1.9s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1;   box-shadow: 0 0 8px #4EE04E; }
+      50%       { opacity: 0.3; box-shadow: 0 0 2px #4EE04E; }
+    }
+
+    /* ── CONNECT BUTTON ───────────────────────────── */
+    .connect-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Signature element: infection pulse ring */
+    .infection-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 360px; height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(50,85,18,0.38) 0%, transparent 68%);
+      animation: infect 3.2s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes infect {
+      0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.65; }
+      50%       { transform: translate(-50%, -50%) scale(1.5); opacity: 0.15; }
+    }
+
+    .btn-connect {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.4rem, 7vw, 3.2rem);
+      letter-spacing: 0.2em;
+      color: #0A0B06;
+      background: linear-gradient(180deg, var(--orange-bright) 0%, var(--orange) 52%, var(--orange-dark) 100%);
+      border: none;
+      border-radius: 5px;
+      border-top:    2px solid rgba(255, 210, 120, 0.45);
+      border-bottom: 2px solid rgba(90, 30, 0, 0.9);
+      padding: 20px 88px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow:
+        0 0 36px rgba(232,114,12,0.42),
+        0 10px 28px rgba(0,0,0,0.75),
+        inset 0 1px 0 rgba(255,220,140,0.28),
+        inset 0 -1px 0 rgba(90,30,0,0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      position: relative;
+      user-select: none;
+    }
+    /* Shine overlay */
+    .btn-connect::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 48%);
+      pointer-events: none;
+    }
+    .btn-connect:hover {
+      background: linear-gradient(180deg, #FFBA55 0%, var(--orange-bright) 52%, var(--orange) 100%);
+      box-shadow:
+        0 0 70px rgba(255,138,30,0.65),
+        0 0 140px rgba(232,114,12,0.18),
+        0 10px 36px rgba(0,0,0,0.85),
+        inset 0 1px 0 rgba(255,230,160,0.4);
+      transform: translateY(-3px) scale(1.025);
+    }
+    .btn-connect:active {
+      transform: translateY(1px) scale(0.985);
+      box-shadow:
+        0 0 22px rgba(232,114,12,0.35),
+        0 4px 14px rgba(0,0,0,0.8),
+        inset 0 3px 6px rgba(0,0,0,0.25);
+    }
+
+    /* ── HELPER TEXT ──────────────────────────────── */
+    .helper-text {
+      margin-top: 22px;
+      max-width: 360px;
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.65;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── SERVER INFO BOX ──────────────────────────── */
+    .server-info {
+      margin-top: 40px;
+      border: 1px solid rgba(232,114,12,0.14);
+      background: rgba(36,46,18,0.28);
+      padding: 14px 32px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .server-info strong {
+      color: rgba(220,170,80,0.65);
+      font-weight: 600;
+    }
+    .server-address {
+      font-family: 'Courier New', monospace;
+      color: rgba(200,144,0,0.58);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 480px) {
+      .btn-connect { padding: 18px 40px; width: 100%; text-align: center; }
+      .server-info { width: 100%; text-align: center; }
+      .infection-ring { width: 260px; height: 90px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .status-dot, .infection-ring { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <div class="danger-tag">zona de infección activa</div>
+
+    <h1 class="title-main">LEFT <em>4</em> DEAD 2</h1>
+    <p class="title-sub">Servidor de Supervivencia</p>
+
+    <div class="divider"></div>
+
+    <div class="status-bar">
+      <span class="status-dot"></span>
+      SERVIDOR EN LÍNEA — ACCESO PERMITIDO
+    </div>
+
+    <div class="connect-wrap">
+      <div class="infection-ring"></div>
+      <a class="btn-connect" href="steam://connect/147.185.221.211:37670">CONECTAR</a>
+      <p class="helper-text">
+        Haz clic para conectarte directamente al servidor.<br>
+        Left 4 Dead 2 debe estar instalado.
+      </p>
+    </div>
+
+    <div class="server-info">
+      <span><strong>IP &nbsp;&nbsp;</strong><span class="server-address">147.185.221.211:37670</span></span>
+      <span><strong>JUEGO</strong>&nbsp; Left 4 Dead 2</span>
+    </div>
+
+  </div>
+
+</body>
+</html>
