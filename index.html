@@ -16,10 +16,10 @@
 
     :root {
       --bg-dark:        #0B0C07;
-      --orange:         #E8720C;
-      --orange-bright:  #FF8A1E;
-      --orange-dark:    #B85A00;
-      --amber:          #C89000;
+      --orange:         #CC1A1A;
+      --orange-bright:  #E83030;
+      --orange-dark:    #8B0000;
+      --amber:          #D44040;
       --text-primary:   #E8D4B0;
       --text-muted:     #7A7060;
     }
@@ -46,11 +46,11 @@
           -47deg,
           transparent,
           transparent 110px,
-          rgba(255,130,0,0.018) 110px,
-          rgba(255,130,0,0.018) 111px
+          rgba(200,30,30,0.018) 110px,
+          rgba(200,30,30,0.018) 111px
         ),
         /* centre glow */
-        radial-gradient(ellipse at 50% 42%, #1B240D 0%, var(--bg-dark) 68%);
+        radial-gradient(ellipse at 50% 42%, #200A0A 0%, var(--bg-dark) 68%);
       color: var(--text-primary);
       display: flex;
       flex-direction: column;
@@ -130,14 +130,14 @@
       text-shadow:
         2px 2px 0 #000,
         4px 4px 0 rgba(0,0,0,0.45),
-        0 0 50px rgba(232,114,12,0.2);
+        0 0 50px rgba(204,26,26,0.2);
     }
     .title-main em {
       font-style: normal;
       color: var(--orange);
       text-shadow:
-        0 0 28px rgba(232,114,12,0.7),
-        0 0 70px rgba(232,114,12,0.25),
+        0 0 28px rgba(204,26,26,0.8),
+        0 0 70px rgba(204,26,26,0.3),
         2px 2px 0 #000;
     }
 
@@ -206,7 +206,7 @@
       transform: translate(-50%, -50%);
       width: 360px; height: 120px;
       border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(50,85,18,0.38) 0%, transparent 68%);
+      background: radial-gradient(ellipse, rgba(120,20,20,0.4) 0%, transparent 68%);
       animation: infect 3.2s ease-in-out infinite;
       pointer-events: none;
       z-index: -1;
@@ -220,24 +220,25 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(2.4rem, 7vw, 3.2rem);
       letter-spacing: 0.2em;
-      color: #0A0B06;
+      color: #F0DDD0;
       background: linear-gradient(180deg, var(--orange-bright) 0%, var(--orange) 52%, var(--orange-dark) 100%);
       border: none;
       border-radius: 5px;
-      border-top:    2px solid rgba(255, 210, 120, 0.45);
-      border-bottom: 2px solid rgba(90, 30, 0, 0.9);
+      border-top:    2px solid rgba(255, 160, 160, 0.45);
+      border-bottom: 2px solid rgba(60, 0, 0, 0.9);
       padding: 20px 88px;
       cursor: pointer;
       text-decoration: none;
       display: inline-block;
       box-shadow:
-        0 0 36px rgba(232,114,12,0.42),
+        0 0 36px rgba(204,26,26,0.5),
         0 10px 28px rgba(0,0,0,0.75),
-        inset 0 1px 0 rgba(255,220,140,0.28),
-        inset 0 -1px 0 rgba(90,30,0,0.5);
+        inset 0 1px 0 rgba(255,180,180,0.25),
+        inset 0 -1px 0 rgba(60,0,0,0.5);
       transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
       position: relative;
       user-select: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
     /* Shine overlay */
     .btn-connect::before {
@@ -249,20 +250,20 @@
       pointer-events: none;
     }
     .btn-connect:hover {
-      background: linear-gradient(180deg, #FFBA55 0%, var(--orange-bright) 52%, var(--orange) 100%);
+      background: linear-gradient(180deg, #FF5555 0%, var(--orange-bright) 52%, var(--orange) 100%);
       box-shadow:
-        0 0 70px rgba(255,138,30,0.65),
-        0 0 140px rgba(232,114,12,0.18),
+        0 0 70px rgba(232,48,48,0.65),
+        0 0 140px rgba(204,26,26,0.22),
         0 10px 36px rgba(0,0,0,0.85),
-        inset 0 1px 0 rgba(255,230,160,0.4);
+        inset 0 1px 0 rgba(255,200,200,0.3);
       transform: translateY(-3px) scale(1.025);
     }
     .btn-connect:active {
       transform: translateY(1px) scale(0.985);
       box-shadow:
-        0 0 22px rgba(232,114,12,0.35),
+        0 0 22px rgba(204,26,26,0.4),
         0 4px 14px rgba(0,0,0,0.8),
-        inset 0 3px 6px rgba(0,0,0,0.25);
+        inset 0 3px 6px rgba(0,0,0,0.3);
     }
 
     /* ── HELPER TEXT ──────────────────────────────── */
@@ -279,8 +280,8 @@
     /* ── SERVER INFO BOX ──────────────────────────── */
     .server-info {
       margin-top: 40px;
-      border: 1px solid rgba(232,114,12,0.14);
-      background: rgba(36,46,18,0.28);
+      border: 1px solid rgba(204,26,26,0.2);
+      background: rgba(40,10,10,0.35);
       padding: 14px 32px;
       display: inline-flex;
       flex-direction: column;
@@ -291,12 +292,12 @@
       text-transform: uppercase;
     }
     .server-info strong {
-      color: rgba(220,170,80,0.65);
+      color: rgba(220,140,140,0.7);
       font-weight: 600;
     }
     .server-address {
       font-family: 'Courier New', monospace;
-      color: rgba(200,144,0,0.58);
+      color: rgba(190,100,100,0.65);
       font-size: 0.76rem;
       letter-spacing: 0.1em;
     }
